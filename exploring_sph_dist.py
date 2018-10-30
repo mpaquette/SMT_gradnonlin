@@ -1,37 +1,10 @@
 import numpy as np
-import scipy.stats as st 
 from dipy.data import get_sphere
-from dipy.viz import fvtk
-
-
-def plotODF(ODF, sphere):
-	r = fvtk.ren()
-	sfu = fvtk.sphere_funcs(ODF, sphere, scale=2.2, norm=True)
-	# sfu.RotateX(90)
-	# sfu.RotateY(180)
-	fvtk.add(r, sfu)
-	# outname = 'screenshot_signal_r.png'
-	# fvtk.record(r, n_frames=1, out_path = outname, size=(3000, 1500), magnification = 2)
-	fvtk.show(r)
+# from utils import plotODF, make2D, sphPDF, h_int, h_ext, h_all, h_gs, e_int, e_ext, e_all
+from utils import plotODF, make2D, sphPDF
 
 
 
-def make2D(ODF_list):
-	n = len(ODF_list)
-	sn = int(np.ceil(np.sqrt(n)))
-	grid = np.zeros((sn,sn,len(ODF_list[0])))
-	for i in range(n):
-		ix, iy = divmod(i, sn)
-		grid[ix, iy] = ODF_list[i]
-	return grid
-
-
-def sphPDF(k, mu, direc):
-	# Generate the PDF for a Von-Mises Fisher distribution p=3
-	# at locations direc for concentration k and mean orientation mu
-	C3 = k / (2*np.pi*(np.exp(k)-np.exp(-k)))
-	tmp = np.exp(k*np.dot(direc,mu[:,None])).squeeze()
-	return C3*tmp
 
 
 # # sphere = get_sphere('repulsion724')
@@ -52,8 +25,8 @@ def sphPDF(k, mu, direc):
 
 
 # 2-mixture
-# sphere = get_sphere('repulsion724')
-sphere = get_sphere('repulsion724').subdivide()
+sphere = get_sphere('repulsion724')
+# sphere = get_sphere('repulsion724').subdivide()
 
 
 dists = []
