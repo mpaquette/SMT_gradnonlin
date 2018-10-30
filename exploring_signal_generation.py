@@ -2,7 +2,8 @@ import numpy as np
 from dipy.data import get_sphere
 # from utils import plotODF, make2D, sphPDF, h_int, h_ext, h_all, h_gs, e_int, e_ext, e_all
 from utils import plotODF, sphPDF, h_gs, e_all
-from dipy.core.sphere import HemiSphere
+# from dipy.core.sphere import HemiSphere
+from dipy.core.sphere import Sphere
 
 
 dpath = '/home/raid2/paquette/work/SMT_gradnonlin/data/'
@@ -15,6 +16,10 @@ bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 # remove b0
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
+
+# sym
+bvecs = np.concatenate((bvecs,-bvecs), axis=0)
+bvals = np.concatenate((bvals, bvals), axis=0)
 
 
 # sample spherical distribution
@@ -48,7 +53,7 @@ gt_smt = e_all((bvals*1e-3).mean(), lam, v_int)
 
 print(exp_smt, gt_smt)
 
-from dipy.core.sphere import HemiSphere
-plotODF(np.concatenate((signal,signal)), HemiSphere(xyz=bvecs).mirror())
+# plotODF(np.concatenate((signal,signal)), HemiSphere(xyz=bvecs).mirror())
+plotODF(signal, Sphere(xyz=bvecs))
 
 

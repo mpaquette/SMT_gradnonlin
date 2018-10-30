@@ -17,6 +17,9 @@ bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
 
+# sym
+bvecs = np.concatenate((bvecs,-bvecs), axis=0)
+bvals = np.concatenate((bvals, bvals), axis=0)
 
 # sample spherical distribution
 ODFS_low = []
