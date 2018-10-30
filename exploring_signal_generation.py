@@ -51,10 +51,11 @@ def h_all(b, g, w, lam, v_int):
 	return v_int*hint + (1-v_int)*hext
 
 
-def h_gs(b, gs, w, ODF, lam, v_int):
+def h_gs(bs, gs, w, ODF, lam, v_int):
 	# loop over gradient directions
 	sig = np.zeros(gs.shape[0])
 	for i in range(gs.shape[0]):
+		b = bs[i]
 		g = gs[i]
 		s = h_all(b, g, w, lam, v_int)
 		sig[i] = np.sum(s*ODF)
@@ -110,7 +111,7 @@ pdf = pdf/pdf.sum()
 lam = 1.7
 v_int = 0.6
 
-signal = h_gs((bvals*1e-3).mean(), bvecs, sphere.vertices, pdf, lam, v_int)
+signal = h_gs((bvals*1e-3), bvecs, sphere.vertices, pdf, lam, v_int)
 
 exp_smt = signal.mean()
 gt_smt = e_all((bvals*1e-3).mean(), lam, v_int)
