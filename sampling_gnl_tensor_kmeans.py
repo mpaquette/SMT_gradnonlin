@@ -32,7 +32,10 @@ dev_Z *= 0.01
 dev = np.concatenate((dev_X, dev_Y, dev_Z), axis=3)
 
 dev_flat = dev[mask.astype(np.bool)]
-
+# these 3 are the "same", i.e. the right way
+# [dev_X[35,35,20].dot(bvec), dev_Y[35,35,20].dot(bvec), dev_Z[35,35,20].dot(bvec)]
+# np.concatenate((dev_X[35,35,20][None,:],dev_Y[35,35,20][None,:],dev_Z[35,35,20][None,:]), axis=0).dot(bvec)
+# dev_flat[idx].reshape(3,3).dot(bvec)
 
 n_parcel = 3
 # for n_parcel in range(2,21):
