@@ -1,8 +1,8 @@
 import numpy as np
 from dipy.data import get_sphere
 import pylab as pl
-# from utils import plotODF, make2D, sphPDF, h_int, h_ext, h_all, h_gs, e_int, e_ext, e_all
-from utils import plotODF, make2D, sphPDF, h_gs, e_all
+# from utils import plotODF, make2D, sphPDF, sphPDF_sym, h_int, h_ext, h_all, h_gs, e_int, e_ext, e_all
+from utils import plotODF, make2D, sphPDF_sym, h_gs, e_all
 
 
 
@@ -27,17 +27,19 @@ sphere_low = get_sphere('repulsion724')
 for mu1 in [np.array([0,0,1])]:
 	for k1 in [1, 2, 4, 16]:
 		# comp1 (symmetric)
-		d1 = sphPDF(k1, mu1, sphere_low.vertices)
-		d2 = sphPDF(k1, mu1, -sphere_low.vertices)
-		dd1 = (d1+d2)/2.
-		dd1 = dd1/dd1.sum()
+		# d1 = sphPDF(k1, mu1, sphere_low.vertices)
+		# d2 = sphPDF(k1, mu1, -sphere_low.vertices)
+		# dd1 = (d1+d2)/2.
+		# dd1 = dd1/dd1.sum()
+		dd1 = sphPDF_sym(k1, mu1, sphere_low.vertices, True)
 		for mu2 in [np.array([1,0,0]), np.array([0,1,0]), np.array([0,0,1])]:
 			for k2 in [1, 2, 4, 16]:
 				# comp2 (symmetric)
-				d1 = sphPDF(k2, mu2, sphere_low.vertices)
-				d2 = sphPDF(k2, mu2, -sphere_low.vertices)
-				dd2 = (d1+d2)/2.
-				dd2 = dd2/dd2.sum()
+				# d1 = sphPDF(k2, mu2, sphere_low.vertices)
+				# d2 = sphPDF(k2, mu2, -sphere_low.vertices)
+				# dd2 = (d1+d2)/2.
+				# dd2 = dd2/dd2.sum()
+				dd2 = sphPDF_sym(k2, mu2, sphere_low.vertices, True)
 				for v1 in [0.25, 0.5, 0.75]:
 					pdf = v1*dd1+(1-v1)*dd2
 					pdf = pdf/pdf.sum()

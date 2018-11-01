@@ -28,6 +28,14 @@ def sphPDF(k, mu, direc):
 	tmp = np.exp(k*np.dot(direc,mu[:,None])).squeeze()
 	return C3*tmp
 
+def sphPDF_sym(k, mu, direc, norm=False):
+	d1 = sphPDF(k, mu, direc)
+	d2 = sphPDF(k, mu, -direc)
+	dd1 = (d1+d2)/2.
+	if norm:
+		dd1 = dd1/dd1.sum()
+	return dd1
+
 def h_int(b, g, w, lam):
 	# single g
 	return np.exp(-b*(np.dot(w,g[:,None])**2)*lam).squeeze()
