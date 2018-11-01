@@ -5,6 +5,7 @@ import pylab as pl
 from utils import plotODF, make2D, sphPDF_sym, h_gs, e_all
 import seaborn as sns
 
+res_folder = '/NOBACKUP2/paquette/SMT_gradnonlin_res/'
 
 dpath = '/home/raid2/paquette/work/SMT_gradnonlin/data/'
 bvecs = np.genfromtxt(dpath+'bvecs_b10.txt')
@@ -16,6 +17,7 @@ bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 # remove b0
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
+bvals = bvals*(1/10.)
 
 # sym
 bvecs = np.concatenate((bvecs,-bvecs), axis=0)
@@ -27,24 +29,6 @@ centroid = centroid.reshape(centroid.shape[0],3,3)
 
 
 
-# sample spherical distribution
-ODFS = []
-sphere = get_sphere('repulsion724')
-for mu1 in [np.array([0,0,1])]:
-	for k1 in [1, 2, 4, 16]:
-		# comp1 (symmetric)
-		dd1 = sphPDF_sym(k1, mu1, sphere.vertices, True)
-		for mu2 in [np.array([1,0,0]), np.array([0,1,0]), np.array([0,0,1])]:
-			for k2 in [1, 2, 4, 16]:
-				# comp2 (symmetric)
-				dd2 = sphPDF_sym(k2, mu2, sphere.vertices, True)
-				for v1 in [0.25, 0.5, 0.75]:
-					pdf = v1*dd1+(1-v1)*dd2
-					pdf = pdf/pdf.sum()
-					ODFS.append(pdf)
-
-
-# plotODF(make2D(ODFS), sphere)
 
 
 # distorting btable
@@ -59,6 +43,10 @@ for ic in range(centroid.shape[0]):
 	new_bval = bvals*(new_norm**2)
 	new_bvecs.append(new_bvec)
 	new_bvals.append(new_bval)
+
+np.save(res_folder + 'bvecs_b1_1.npy', np.array(new_bvecs))
+np.save(res_folder + 'bvals_b1_1.npy', np.array(new_bvals))
+
 
 
 allb = np.array(new_bvals)
@@ -83,6 +71,31 @@ angle_diff = ((180/np.pi)*np.arccos((2-np.linalg.norm(allvdiff, axis=2)**2)/2)).
 # frame1.axes.yaxis.set_ticklabels([])
 # pl.title('Distribution of b-value modifier inside full brain')
 # pl.show()
+
+
+
+
+
+
+
+# sample spherical distribution
+ODFS = []
+sphere = get_sphere('repulsion724')
+for mu1 in [np.array([0,0,1])]:
+	for k1 in [1, 2, 4, 16]:
+		# comp1 (symmetric)
+		dd1 = sphPDF_sym(k1, mu1, sphere.vertices, True)
+		for mu2 in [np.array([1,0,0]), np.array([0,1,0]), np.array([0,0,1])]:
+			for k2 in [1, 2, 4, 16]:
+				# comp2 (symmetric)
+				dd2 = sphPDF_sym(k2, mu2, sphere.vertices, True)
+				for v1 in [0.25, 0.5, 0.75]:
+					pdf = v1*dd1+(1-v1)*dd2
+					pdf = pdf/pdf.sum()
+					ODFS.append(pdf)
+
+
+# plotODF(make2D(ODFS), sphere)
 
 
 
@@ -120,6 +133,50 @@ for i_m, mic in enumerate(micro):
 			i_tot += 1
 			if not i_tot%1000:
 				print('{} / {}   {:.2f}'.format(i_tot, tot, i_tot/float(tot)))
+
+
+
+
+# np.save(res_folder + 'gt_mean_b10_1.npy', gt_mean)
+# np.save(res_folder + 'signal_nod_b10_1.npy', signal_nod)
+# np.save(res_folder + 'signal_b10_1.npy', signal)
+
+np.save(res_folder + 'gt_mean_b1_1.npy', gt_mean)
+np.save(res_folder + 'signal_nod_b1_1.npy', signal_nod)
+np.save(res_folder + 'signal_b1_1.npy', signal)
+
+
+
+
+
+# # fix microstructure configuration
+# i_m = 22
+
+# for i_m in range(25):
+# 	pl.figure()
+# 	pl.axhline(gt_mean[i_m], label='GT')
+# 	pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted')
+# 	pl.title('Effect of GNL on sph mean')
+# 	pl.legend()
+# pl.show()
+
+
+
+
+
+# # fix microstructure configuration
+# i_m = 22
+
+# pl.figure()
+# for i_m in range(25):
+# 	# pl.axhline(gt_mean[i_m], label='GT')
+# 	pl.errorbar(np.arange(len(new_bvals))+0.5*np.random.rand(len(new_bvals)), signal[:,i_m,:,:].mean(axis=(1,2))/gt_mean[i_m], fmt='.', label='Distorted', alpha=0.5)
+# 	pl.title('Effect of GNL on sph mean')
+# # pl.legend()
+# pl.show()
+
+
+
 
 
 
