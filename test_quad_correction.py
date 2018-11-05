@@ -12,11 +12,15 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
+b_low = 1
+b_high = 10
+
+
 # remove b0
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
-bvals_low = bvals*(2/10.)
-bvals_high = bvals*(3/10.)
+bvals_low = bvals*(b_low/10.)
+bvals_high = bvals*(b_high/10.)
 
 
 # sym
@@ -29,19 +33,19 @@ bvals_high = np.concatenate((bvals_high, bvals_high), axis=0)
 # centroid = centroid.reshape(centroid.shape[0],3,3)
 
 
-new_bvecs_low = np.load(res_folder + 'bvecs_b2_1.npy')
-new_bvals_low = np.load(res_folder + 'bvals_b2_1.npy')
+new_bvecs_low = np.load(res_folder + 'bvecs_b{}_1.npy'.format(b_low))
+new_bvals_low = np.load(res_folder + 'bvals_b{}_1.npy'.format(b_low))
 
-new_bvecs_high = np.load(res_folder + 'bvecs_b3_1.npy')
-new_bvals_high = np.load(res_folder + 'bvals_b3_1.npy')
+new_bvecs_high = np.load(res_folder + 'bvecs_b{}_1.npy'.format(b_high))
+new_bvals_high = np.load(res_folder + 'bvals_b{}_1.npy'.format(b_high))
 
-gt_mean_low = np.load(res_folder + 'gt_mean_b2_1.npy')
-signal_nod_low = np.load(res_folder + 'signal_nod_b2_1.npy')
-signal_low = np.load(res_folder + 'signal_b2_1.npy')
+gt_mean_low = np.load(res_folder + 'gt_mean_b{}_1.npy'.format(b_low))
+signal_nod_low = np.load(res_folder + 'signal_nod_b{}_1.npy'.format(b_low))
+signal_low = np.load(res_folder + 'signal_b{}_1.npy'.format(b_low))
 
-gt_mean_high = np.load(res_folder + 'gt_mean_b3_1.npy')
-signal_nod_high = np.load(res_folder + 'signal_nod_b3_1.npy')
-signal_high = np.load(res_folder + 'signal_b3_1.npy')
+gt_mean_high = np.load(res_folder + 'gt_mean_b{}_1.npy'.format(b_high))
+signal_nod_high = np.load(res_folder + 'signal_nod_b{}_1.npy'.format(b_high))
+signal_high = np.load(res_folder + 'signal_b{}_1.npy'.format(b_high))
 
 
 
@@ -63,7 +67,7 @@ new_signal_high = np.exp(-(bvals_high*1e-3)*Ds+(((bvals_high*1e-3)*Ds)**2*Ks)/6.
 
 
 # fix microstructure configuration
-i_m = 0
+i_m = 22
 
 pl.figure()
 pl.axhline(gt_mean_low[i_m], label='GT')

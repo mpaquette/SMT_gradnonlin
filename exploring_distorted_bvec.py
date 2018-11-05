@@ -14,10 +14,12 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
+bb = 5
+
 # remove b0
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
-bvals = bvals*(1/10.)
+bvals = bvals*(bb/10.)
 
 # sym
 bvecs = np.concatenate((bvecs,-bvecs), axis=0)
@@ -44,8 +46,8 @@ for ic in range(centroid.shape[0]):
 	new_bvecs.append(new_bvec)
 	new_bvals.append(new_bval)
 
-np.save(res_folder + 'bvecs_b1_1.npy', np.array(new_bvecs))
-np.save(res_folder + 'bvals_b1_1.npy', np.array(new_bvals))
+np.save(res_folder + 'bvecs_b{}_1.npy'.format(bb), np.array(new_bvecs))
+np.save(res_folder + 'bvals_b{}_1.npy'.format(bb), np.array(new_bvals))
 
 
 
@@ -136,14 +138,9 @@ for i_m, mic in enumerate(micro):
 
 
 
-
-# np.save(res_folder + 'gt_mean_b10_1.npy', gt_mean)
-# np.save(res_folder + 'signal_nod_b10_1.npy', signal_nod)
-# np.save(res_folder + 'signal_b10_1.npy', signal)
-
-np.save(res_folder + 'gt_mean_b1_1.npy', gt_mean)
-np.save(res_folder + 'signal_nod_b1_1.npy', signal_nod)
-np.save(res_folder + 'signal_b1_1.npy', signal)
+np.save(res_folder + 'gt_mean_b{}_1.npy'.format(bb), gt_mean)
+np.save(res_folder + 'signal_nod_b{}_1.npy'.format(bb), signal_nod)
+np.save(res_folder + 'signal_b{}_1.npy'.format(bb), signal)
 
 
 

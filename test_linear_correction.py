@@ -12,10 +12,12 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
+bb = 2
+
 # remove b0
 bvecs = bvecs[bvals>10]
 bvals = bvals[bvals>10]
-bvals = bvals*(2/10.)
+bvals = bvals*(bb/10.)
 
 # sym
 bvecs = np.concatenate((bvecs,-bvecs), axis=0)
@@ -26,15 +28,12 @@ bvals = np.concatenate((bvals, bvals), axis=0)
 # centroid = centroid.reshape(centroid.shape[0],3,3)
 
 
-new_bvecs = np.load(res_folder + 'bvecs_b2_1.npy')
-new_bvals = np.load(res_folder + 'bvals_b2_1.npy')
+new_bvecs = np.load(res_folder + 'bvecs_b{}_1.npy'.format(bb))
+new_bvals = np.load(res_folder + 'bvals_b{}_1.npy'.format(bb))
 
-
-gt_mean = np.load(res_folder + 'gt_mean_b2_1.npy')
-signal_nod = np.load(res_folder + 'signal_nod_b2_1.npy')
-signal = np.load(res_folder + 'signal_b2_1.npy')
-
-
+gt_mean = np.load(res_folder + 'gt_mean_b{}_1.npy'.format(bb))
+signal_nod = np.load(res_folder + 'signal_nod_b{}_1.npy'.format(bb))
+signal = np.load(res_folder + 'signal_b{}_1.npy'.format(bb))
 
 
 # All directions are modeled independantly
