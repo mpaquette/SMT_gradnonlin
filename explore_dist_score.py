@@ -72,7 +72,16 @@ pl.show()
 
 
 
+new_bvals_mean = np.array([np.abs((b-bvals)).mean() for b in new_bvals])
+new_bvals_std = np.array([(b-bvals).std() for b in new_bvals])
 
+idxkey = np.argsort(dist_score)
+AA = dist_score[idxkey]
+BB = new_bvals_mean[idxkey]
 
-
+pl.figure()
+# pl.plot(AA, BB, '.')
+pl.scatter(AA, BB)
+pl.title('Distorsion score vs bvals standard deviation, R^2 = {:.2f}'.format(np.corrcoef(AA, BB)[0,1]))
+pl.show()
 
