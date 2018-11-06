@@ -130,16 +130,16 @@ gt_mean = np.load(res_folder + 'rotfig_gt_mean_b{}_1.npy'.format(bb))
 
 
 
-# fix microstructure configuration
-i_m = 0
+# # fix microstructure configuration
+# i_m = 0
 
-pl.figure()
-pl.axhline(gt_mean[i_m], label='GT')
-for i_b in range(0,100,10):
-	pl.plot(signal[i_b,i_m,:,:].mean(axis=1), label='GNL {:.2e}'.format(sorted(dist_score)[i_b]))
-# pl.title('Effect of GNL on sph mean')
-pl.legend()
-pl.show()
+# pl.figure()
+# pl.axhline(gt_mean[i_m], label='GT')
+# for i_b in range(0,100,10):
+# 	pl.plot(signal[i_b,i_m,:,:].mean(axis=1), label='GNL {:.2e}'.format(sorted(dist_score)[i_b]))
+# # pl.title('Effect of GNL on sph mean')
+# pl.legend()
+# pl.show()
 
 
 
