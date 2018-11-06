@@ -1,7 +1,7 @@
 import numpy as np
 import nibabel as nib 
 import sys
-
+import pylab as pl
 
 dpath = '/home/raid2/paquette/work/SMT_gradnonlin/data/'
 
@@ -34,14 +34,14 @@ out4[~mask.astype(np.bool)]=0
 
 
 
-pl.figure()
-pl.hist(allb, 50, density=True, color=(0.0,0.0,0.99,0.5))
-sns.kdeplot(allb, bw=0.015, color='red')
-frame1 = pl.gca()
-frame1.axes.yaxis.set_ticklabels([])
-# pl.title('Distribution of b-value modifier inside full brain')
-pl.xlabel('b-value multiplier', size=16)
-pl.show()
+# pl.figure()
+# pl.hist(allb, 50, density=True, color=(0.0,0.0,0.99,0.5))
+# sns.kdeplot(allb, bw=0.015, color='red')
+# frame1 = pl.gca()
+# frame1.axes.yaxis.set_ticklabels([])
+# # pl.title('Distribution of b-value modifier inside full brain')
+# pl.xlabel('b-value multiplier', size=16)
+# pl.show()
 
 
 
@@ -49,10 +49,10 @@ pl.show()
 
 
 
-import pylab as pl
+# import pylab as pl
 from mpl_toolkits.axes_grid1 import ImageGrid
 
-pl.rcParams.update({'font.size': 12})
+pl.rcParams.update({'font.size': 16})
 
 # fig = pl.figure(figsize=(9.75, 3))
 fig = pl.figure()
@@ -64,13 +64,53 @@ grid = ImageGrid(fig, 111,          # as in plt.subplot(111)
                  cbar_mode="single",
                  cbar_size="7%",
                  cbar_pad=0.15,
+                 aspect=False,
                  )
 
 
 xx,yy,zz = out4.shape
-im = grid[0].imshow(out4[:,:,zz//2], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
-im = grid[1].imshow(out4[:,yy//2,:], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
-im = grid[2].imshow(out4[xx//2,:,:], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+
+# ccc = pl.cm.viridis
+ccc = pl.cm.inferno
+
+# im = grid[1].imshow(out4[:,yy//2,:], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# im = grid[2].imshow(out4[xx//2,:,:], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# im = grid[0].imshow(out4[:,:,zz//2], cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+
+# im = grid[1].imshow(out4[:,yy//2,::-1].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# im = grid[2].imshow(out4[xx//2,:,::-1].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# im = grid[0].imshow(out4[:-9:1,-9::-1,zz//2].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+
+im = grid[1].imshow(out4[:,yy//2,::-1].T, cmap=ccc, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+im = grid[2].imshow(out4[xx//2,:,::-1].T, cmap=ccc, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+im = grid[0].imshow(out4[:-9:1,-9::-1,zz//2].T, cmap=ccc, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+
+
+for ax in grid:
+	ax.xaxis.set_visible(False)
+	ax.yaxis.set_visible(False)
+
+grid[0].set_title('Axial')
+grid[1].set_title('Coronal')
+grid[2].set_title('Sagittal')
+
+
+# Colorbar
+grid[0].cax.colorbar(im)
+grid[0].cax.toggle_label(True)
+
+pl.show()
+
+
+
+
+
+
+
+
+
+
+
 
 # im = grid[0].imshow(out4[:,:,zz//2], cmap=pl.cm.jet, interpolation='bilinear', vmin=out4.min(), vmax=out4.max())
 # im = grid[1].imshow(out4[:,yy//2,:], cmap=pl.cm.jet, interpolation='bilinear', vmin=out4.min(), vmax=out4.max())
@@ -86,15 +126,26 @@ im = grid[2].imshow(out4[xx//2,:,:], cmap=pl.cm.jet, interpolation='nearest', vm
 
 
 
-for ax in grid:
-	ax.xaxis.set_visible(False)
-	ax.yaxis.set_visible(False)
 
 
-# Colorbar
-grid[2].cax.colorbar(im)
-grid[2].cax.toggle_label(True)
+# pl.rcParams.update({'font.size': 12})
+# fig = pl.figure()
+# xx,yy,zz = out4.shape
+# pl.subplot(1,3,1)
+# pl.imshow(out4[:,::-1,zz//2].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# pl.gca().xaxis.set_visible(False)
+# pl.gca().yaxis.set_visible(False)
+# pl.subplot(1,3,2)
+# pl.imshow(out4[:,yy//2,::-1].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# pl.gca().xaxis.set_visible(False)
+# pl.gca().yaxis.set_visible(False)
+# pl.subplot(1,3,3)
+# pl.imshow(out4[xx//2,:,::-1].T, cmap=pl.cm.jet, interpolation='nearest', vmin=out4.min(), vmax=out4.max())
+# pl.gca().xaxis.set_visible(False)
+# pl.gca().yaxis.set_visible(False)
+# pl.show()
 
-pl.show()
+
+
 
 

@@ -101,27 +101,34 @@ gt_mean = np.zeros(len(micro))
 res_folder = '/NOBACKUP2/paquette/SMT_gradnonlin_res/'
 
 
-i_tot=0
-for i_m, mic in enumerate(micro):
-	lam, v_int = mic
-	# ground truth spherical mean for this microstructure configuration
-	gt_mean[i_m] = e_all((bvals*1e-3).mean(), lam, v_int)
-	for i_o, pdf in enumerate(ODFS):
-		# "ground truth" signal assuming no gradient non-linearity
-		signal_nod[i_m, i_o, :] = h_gs((bvals*1e-3), bvecs, sphere.vertices, pdf, lam, v_int)
-		for i_b in range(len(new_bvals)):
-			vecs = new_bvecs[i_b]
-			vals = new_bvals[i_b]
-			signal[i_b, i_m, i_o, :] = h_gs((vals*1e-3), vecs, sphere.vertices, pdf, lam, v_int)
-			i_tot += 1
-			if not i_tot%1000:
-				print('{} / {}   {:.2f}'.format(i_tot, tot, i_tot/float(tot)))
+# i_tot=0
+# for i_m, mic in enumerate(micro):
+# 	lam, v_int = mic
+# 	# ground truth spherical mean for this microstructure configuration
+# 	gt_mean[i_m] = e_all((bvals*1e-3).mean(), lam, v_int)
+# 	for i_o, pdf in enumerate(ODFS):
+# 		# "ground truth" signal assuming no gradient non-linearity
+# 		signal_nod[i_m, i_o, :] = h_gs((bvals*1e-3), bvecs, sphere.vertices, pdf, lam, v_int)
+# 		for i_b in range(len(new_bvals)):
+# 			vecs = new_bvecs[i_b]
+# 			vals = new_bvals[i_b]
+# 			signal[i_b, i_m, i_o, :] = h_gs((vals*1e-3), vecs, sphere.vertices, pdf, lam, v_int)
+# 			i_tot += 1
+# 			if not i_tot%1000:
+# 				print('{} / {}   {:.2f}'.format(i_tot, tot, i_tot/float(tot)))
 
 
 
-np.save(res_folder + 'rotfig_signal_b{}_1.npy'.format(bb), signal)
-np.save(res_folder + 'rotfig_signal_nod_b{}_1.npy'.format(bb), signal_nod)
-np.save(res_folder + 'rotfig_gt_mean_b{}_1.npy'.format(bb), gt_mean)
+# np.save(res_folder + 'rotfig_signal_b{}_1.npy'.format(bb), signal)
+# np.save(res_folder + 'rotfig_signal_nod_b{}_1.npy'.format(bb), signal_nod)
+# np.save(res_folder + 'rotfig_gt_mean_b{}_1.npy'.format(bb), gt_mean)
+
+signal = np.load(res_folder + 'rotfig_signal_b{}_1.npy'.format(bb))
+signal_nod = np.load(res_folder + 'rotfig_signal_nod_b{}_1.npy'.format(bb))
+gt_mean = np.load(res_folder + 'rotfig_gt_mean_b{}_1.npy'.format(bb))
+
+
+
 
 # fix microstructure configuration
 i_m = 0
@@ -136,44 +143,66 @@ pl.show()
 
 
 
+# # fix microstructure configuration
+# i_m = 0
+
+# pl.figure()
+# pl.axhline(gt_mean[i_m], label='GT')
+# pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='GNL')
+# # pl.title('Effect of GNL on sph mean')
+# pl.legend()
+# pl.show()
+
+
+# # fix microstructure configuration
+# i_m = 0
+
+# pl.figure()
+# pl.axhline(0, label='GT')
+# pl.errorbar(np.arange(len(new_bvals))+0.0, np.abs(signal[:,i_m,:,:].mean(axis=(1,2))-gt_mean[i_m]), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='o', label='GNL')
+# # pl.title('Effect of GNL on sph mean')
+# pl.legend()
+# pl.show()
+
+
+# # fix microstructure configuration
+# i_m = 0
+
+# pl.figure()
+# pl.axhline(0, label='GT')
+# pl.errorbar(np.arange(len(new_bvals))+0.0, (signal[:,i_m,:,:].mean(axis=(1,2))-gt_mean[i_m])/gt_mean[i_m], yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1)/gt_mean[i_m], fmt='.', label='GNL')
+# # pl.title('Effect of GNL on sph mean')
+# pl.legend()
+# pl.show()
+
+
+
+pl.rcParams.update({'font.size': 12})
+
+gt_meanmod = np.load(res_folder + 'gt_mean_mod_b{}_1.npy'.format(bb))
+gt_meanmod = gt_meanmod[np.argsort(dist_score)]
 # fix microstructure configuration
 i_m = 0
 
+np.random.seed(0)
 pl.figure()
-pl.axhline(gt_mean[i_m], label='GT')
-pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='GNL')
-# pl.title('Effect of GNL on sph mean')
+pl.axhline(gt_mean[i_m], label='ORIGINAL b', c=(1.0,0.0,0.0))
+for i_b in range(0,100,10):
+	cc = np.random.rand(3)
+	pl.axhline(gt_meanmod[i_b, 7], c=cc)
+	pl.plot(signal[i_b,i_m,:,:].mean(axis=1), c=cc)
+# frame1 = pl.gca()
+# frame1.axes.xaxis.set_label('Orientation of structure')
+# frame1.axes.yaxis.set_label('SM')
+pl.xlabel('Orientation of structure')
+pl.ylabel('SM')
+
+
+pl.title('SM of (lam,v_int)={} at b~{} vs mean b for various GNLT'.format(micro[i_m],bb))
 pl.legend()
 pl.show()
 
 
-
-
-
-# fix microstructure configuration
-i_m = 0
-
-pl.figure()
-pl.axhline(0, label='GT')
-pl.errorbar(np.arange(len(new_bvals))+0.0, np.abs(signal[:,i_m,:,:].mean(axis=(1,2))-gt_mean[i_m]), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='o', label='GNL')
-# pl.title('Effect of GNL on sph mean')
-pl.legend()
-pl.show()
-
-
-
-
-
-
-# fix microstructure configuration
-i_m = 0
-
-pl.figure()
-pl.axhline(0, label='GT')
-pl.errorbar(np.arange(len(new_bvals))+0.0, (signal[:,i_m,:,:].mean(axis=(1,2))-gt_mean[i_m])/gt_mean[i_m], yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1)/gt_mean[i_m], fmt='.', label='GNL')
-# pl.title('Effect of GNL on sph mean')
-pl.legend()
-pl.show()
 
 
 

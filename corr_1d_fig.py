@@ -71,31 +71,31 @@ for bb in bbSS:
 
 
 
-	# fix microstructure configuration
-	i_m = 0
+	# # fix microstructure configuration
+	# i_m = 0
 
-	pl.figure()
-	pl.axhline(gt_mean[i_m], label='GT')
+	# pl.figure()
+	# pl.axhline(gt_mean[i_m], label='GT')
+	# # pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=10*signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-10*std)')
+	# # pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=10*new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-10*std)')
+	# pl.title('Effect of GNL on sph mean')
+	# pl.legend()
+	# # pl.show()
+
+	# # fix microstructure configuration
+	# i_m = 24
+
+	# pl.figure()
+	# pl.axhline(gt_mean[i_m], label='GT')
+	# # pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
 	# pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=10*signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-10*std)')
+	# # pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
 	# pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=10*new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-10*std)')
-	pl.title('Effect of GNL on sph mean')
-	pl.legend()
+	# pl.title('Effect of GNL on sph mean')
+	# pl.legend()
 	# pl.show()
-
-	# fix microstructure configuration
-	i_m = 24
-
-	pl.figure()
-	pl.axhline(gt_mean[i_m], label='GT')
-	# pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals))+0.0, signal[:,i_m,:,:].mean(axis=(1,2)), yerr=signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	# pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals))+0.2, new_signal[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
-	pl.title('Effect of GNL on sph mean')
-	pl.legend()
-	pl.show()
 
 
 
@@ -114,6 +114,65 @@ for bb in bbSS:
 
 
 
+
+from prettytable import PrettyTable
+
+
+errors = np.zeros((len(bbSS),5))
+bcouple = np.zeros(len(bbSS), dtype=tuple)
+
+for ii in range(len(bbSS)):
+	new_signal = new_signalSS[ii]
+
+	gt_mean = gt_meanSS[ii]
+
+	# signal_low = signalSS[i1]
+	# signal_high = signalSS[i2]
+
+	bcouple[ii] = (bbSS[ii],)
+	# tmp = (new_signal.mean(3) - gt_mean[:,None])**2 / (gt_mean[:,None])**2
+	tmp = np.abs(new_signal.mean(3) - gt_mean[:,None])
+	errors[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
+
+
+
+errors_unc = np.zeros((len(bbSS),5))
+for ii in range(len(bbSS)):
+	print(ii)
+	gt_mean = gt_meanSS[ii]
+	signal = signalSS[ii]
+	# tmp = (signal.mean(3) - gt_mean[:,None])**2 / (gt_mean[:,None])**2
+	tmp = np.abs(signal.mean(3) - gt_mean[:,None])
+	errors_unc[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
+
+
+
+
+
+
+    
+x = PrettyTable()
+x.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(bbSS)):
+	# x_low.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors[ii]])
+print(x)
+
+x = PrettyTable()
+x.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(bbSS)):
+	# x_low.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_unc[ii]])
+print(x)
+
+
+
+x_rat = PrettyTable()
+x_rat.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(bbSS)):
+	# x_low_rat.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_rat.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in (errors[ii]/errors_unc[bbSS.index(bcouple[ii][0])])])
+print(x_rat)
 
 
 

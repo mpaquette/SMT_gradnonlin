@@ -12,7 +12,7 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
-bb = 2
+bb = 1
 
 # remove b0
 bvecs = bvecs[bvals>10]

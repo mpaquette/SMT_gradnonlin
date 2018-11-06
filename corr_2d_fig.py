@@ -103,7 +103,8 @@ for i1 in range(Nb-1):
 
 
 		b_idx.append((i1,i2))
-		new_signalSS.append((new_signal_low,new_signal_high))
+		# new_signalSS.append((new_signal_low,new_signal_high))
+		new_signalSS.append((new_signal_low.mean(3),new_signal_high.mean(3)))
 
 
 
@@ -126,7 +127,9 @@ for ii in range(len(b_idx)):
 	pl.subplot(1,2,1)
 	pl.axhline(gt_mean_low[i_m], label='GT')
 	pl.errorbar(np.arange(len(new_bvals_low))+0.0, signal_low[:,i_m,:,:].mean(axis=(1,2)), yerr=signal_low[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals_low))+0.2, new_signal_low[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_low[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals_low))+0.0, signal_low[:,i_m,:].mean(axis=(1,)), yerr=signal_low[:,i_m,:].std(axis=1), fmt='.', label='Distorted (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals_low))+0.2, new_signal_low[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_low[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
+	pl.errorbar(np.arange(len(new_bvals_low))+0.2, new_signal_low[:,i_m,:,].mean(axis=(1)), yerr=new_signal_low[:,i_m,:].std(axis=1), fmt='.', label='ADC corr (+/-std)')
 	pl.title(bbSS[i1])
 	pl.legend()
 
@@ -134,28 +137,12 @@ for ii in range(len(b_idx)):
 	pl.subplot(1,2,2)
 	pl.axhline(gt_mean_high[i_m], label='GT')
 	pl.errorbar(np.arange(len(new_bvals_high))+0.0, signal_high[:,i_m,:,:].mean(axis=(1,2)), yerr=signal_high[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	pl.errorbar(np.arange(len(new_bvals_high))+0.2, new_signal_high[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_high[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals_high))+0.0, signal_high[:,i_m,:].mean(axis=(1,)), yerr=signal_high[:,i_m,:].std(axis=1), fmt='.', label='Distorted (+/-std)')
+	# pl.errorbar(np.arange(len(new_bvals_high))+0.2, new_signal_high[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_high[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
+	pl.errorbar(np.arange(len(new_bvals_high))+0.2, new_signal_high[:,i_m,:].mean(axis=(1,)), yerr=new_signal_high[:,i_m,:].std(axis=1), fmt='.', label='ADC corr (+/-std)')
 	pl.title(bbSS[i2])
 	pl.legend()
 
-
-	# i_m = 24
-
-	# pl.figure()
-	# pl.subplot(1,2,1)
-	# pl.axhline(gt_mean_low[i_m], label='GT')
-	# pl.errorbar(np.arange(len(new_bvals_low))+0.0, signal_low[:,i_m,:,:].mean(axis=(1,2)), yerr=signal_low[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	# pl.errorbar(np.arange(len(new_bvals_low))+0.2, new_signal_low[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_low[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
-	# pl.title(bbSS[i1])
-	# pl.legend()
-
-	# # pl.figure()
-	# pl.subplot(1,2,2)
-	# pl.axhline(gt_mean_high[i_m], label='GT')
-	# pl.errorbar(np.arange(len(new_bvals_high))+0.0, signal_high[:,i_m,:,:].mean(axis=(1,2)), yerr=signal_high[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='Distorted (+/-std)')
-	# pl.errorbar(np.arange(len(new_bvals_high))+0.2, new_signal_high[:,i_m,:,:].mean(axis=(1,2)), yerr=new_signal_high[:,i_m,:,:].mean(axis=2).std(axis=1), fmt='.', label='ADC corr (+/-std)')
-	# pl.title(bbSS[i2])
-	# pl.legend()
 
 pl.show()
 
@@ -181,59 +168,167 @@ for ii in range(len(b_idx)):
 	# signal_high = signalSS[i2]
 
 	bcouple[ii] = (bbSS[i1],bbSS[i2])
-	tmp = (new_signal_low.mean(3) - gt_mean_low[:,None])**2 / (gt_mean_low[:,None])**2
+	# tmp = (new_signal_low - gt_mean_low[:,None])**2 / (gt_mean_low[:,None])**2
+	tmp = np.abs(new_signal_low - gt_mean_low[:,None])
 	errors_low[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
-	tmp = (new_signal_high.mean(3) - gt_mean_high[:,None])**2 / (gt_mean_high[:,None])**2
+	tmp = np.abs(new_signal_high - gt_mean_high[:,None])
+	# errors_high[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
 	errors_high[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
+
+
+errors_unc = np.zeros((len(bbSS),5))
+for ii in range(len(bbSS)):
+	print(ii)
+	gt_mean = gt_meanSS[ii]
+	signal = signalSS[ii]
+	# signal = signalSS[i1] # !!!@%^#&$*%&@#$
+	# tmp = (signal.mean(3) - gt_mean[:,None])**2 / (gt_mean[:,None])**2
+	tmp = np.abs(signal.mean(3) - gt_mean[:,None])
+	errors_unc[ii] = [tmp[:,iD*5:(iD+1)*5,:].mean() for iD in range(5)]
+
+
+
+
+# np.save(res_folder + 'dkifig_errtable_low.npy', errors_low)
+# np.save(res_folder + 'dkifig_errtable_high.npy', errors_high)
+# np.save(res_folder + 'dkifig_errtable_unc.npy', errors_unc)
 
 
 
     
-x = PrettyTable()
-
-x.field_names = ["bvals/Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
-
+x_low = PrettyTable()
+x_low.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
 for ii in range(len(b_idx)):
-	x.add_row([bcouple[ii] + errors_low[ii].tolist()])
+	# x_low.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_low.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_low[ii]])
+print(x_low)
 
-print(x)
-
-
-
-
-
-
-
+    
+x_high = PrettyTable()
+x_high.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
 for ii in range(len(b_idx)):
-	i1,i2 = b_idx[ii]
-	new_signal_low, new_signal_high = new_signalSS[ii]
-
-	gt_mean_low = gt_meanSS[i1]
-	gt_mean_high = gt_meanSS[i2]
-
-	signal_low = signalSS[i1]
-	signal_high = signalSS[i2]
+	# x_high.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_high.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_high[ii]])
+print(x_high)
 
 
-	# fix microstructure configuration
-	i_m = 8
-
-	pl.figure()
-	pl.subplot(1,2,1)
-	# pl.axhline(gt_mean_low[i_m], label='GT')
-	pl.plot(np.arange(len(new_bvals_low))+0.0, (signal_low[:,i_m,:,:].mean(axis=(1,2))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='Distorted (+/-std)')
-	pl.plot(np.arange(len(new_bvals_low))+0.2, (new_signal_low[:,i_m,:,:].mean(axis=(1,2))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='ADC corr (+/-std)')
-	pl.title(bbSS[i1])
-	pl.legend()
-
-	# pl.figure()
-	pl.subplot(1,2,2)
-	# pl.axhline(gt_mean_high[i_m], label='GT')
-	pl.plot(np.arange(len(new_bvals_high))+0.0, (signal_high[:,i_m,:,:].mean(axis=(1,2))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='Distorted (+/-std)')
-	pl.plot(np.arange(len(new_bvals_high))+0.2, (new_signal_high[:,i_m,:,:].mean(axis=(1,2))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='ADC corr (+/-std)')
-	pl.title(bbSS[i2])
-	pl.legend()
+x_low_rat = PrettyTable()
+x_low_rat.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(b_idx)):
+	# x_low_rat.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_low_rat.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_unc[bbSS.index(bcouple[ii][0])]])
+print(x_low_rat)
 
 
-pl.show()
+x_high_rat = PrettyTable()
+x_high_rat.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(b_idx)):
+	# x_low_rat.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_high_rat.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_unc[bbSS.index(bcouple[ii][1])]])
+print(x_high_rat)
+
+
+
+    
+x_low = PrettyTable()
+x_low.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(b_idx)):
+	# x_low.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_low.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_low[ii]/errors_unc[bbSS.index(bcouple[ii][0])]])
+print(x_low)
+
+    
+x_high = PrettyTable()
+x_high.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+for ii in range(len(b_idx)):
+	# x_high.add_row([bcouple[ii]] + errors_low[ii].tolist())
+	x_high.add_row([bcouple[ii]] + ['{:.2e}'.format(i) for i in errors_high[ii]/errors_unc[bbSS.index(bcouple[ii][1])]])
+print(x_high)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# x_low_rat = PrettyTable()
+# x_low_rat.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+# for ii in range(len(b_idx)):
+# 	# x_low_rat.add_row([bcouple[ii]] + errors_low[ii].tolist())
+# 	x_low_rat.add_row([bcouple[ii]] + ['{:.2f}'.format(i) for i in (errors_low[ii]/errors_unc[bbSS.index(bcouple[ii][0])])])
+# print(x_low_rat)
+
+    
+# x_high_rat = PrettyTable()
+# x_high_rat.field_names = ["bvals\Diff", "0.5", "1.0", "1.5", "2.0", "2.5"]
+# for ii in range(len(b_idx)):
+# 	# x_high_rat.add_row([bcouple[ii]] + errors_low[ii].tolist())
+# 	x_high_rat.add_row([bcouple[ii]] + ['{:.2f}'.format(i) for i in (errors_high[ii]/errors_unc[bbSS.index(bcouple[ii][1])])])
+# print(x_high_rat)
+
+
+
+
+
+
+
+
+
+# for ii in range(len(b_idx)):
+# 	i1,i2 = b_idx[ii]
+# 	new_signal_low, new_signal_high = new_signalSS[ii]
+
+# 	gt_mean_low = gt_meanSS[i1]
+# 	gt_mean_high = gt_meanSS[i2]
+
+# 	signal_low = signalSS[i1]
+# 	signal_high = signalSS[i2]
+
+
+# 	# fix microstructure configuration
+# 	i_m = 8
+
+# 	pl.figure()
+# 	pl.subplot(1,2,1)
+# 	# pl.axhline(gt_mean_low[i_m], label='GT')
+# 	# pl.plot(np.arange(len(new_bvals_low))+0.0, (signal_low[:,i_m,:,:].mean(axis=(1,2))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='Distorted (+/-std)')
+# 	pl.plot(np.arange(len(new_bvals_low))+0.0, (signal_low[:,i_m,:].mean(axis=(1,))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='Distorted (+/-std)')
+# 	# pl.plot(np.arange(len(new_bvals_low))+0.2, (new_signal_low[:,i_m,:,:].mean(axis=(1,2))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='ADC corr (+/-std)')
+# 	pl.plot(np.arange(len(new_bvals_low))+0.2, (new_signal_low[:,i_m,:].mean(axis=(1,))-gt_mean_low[i_m])/gt_mean_low[i_m], '.', label='ADC corr (+/-std)')
+# 	pl.title(bbSS[i1])
+# 	pl.legend()
+
+# 	# pl.figure()
+# 	pl.subplot(1,2,2)
+# 	# pl.axhline(gt_mean_high[i_m], label='GT')
+# 	# pl.plot(np.arange(len(new_bvals_high))+0.0, (signal_high[:,i_m,:,:].mean(axis=(1,2))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='Distorted (+/-std)')
+# 	pl.plot(np.arange(len(new_bvals_high))+0.0, (signal_high[:,i_m,:].mean(axis=(1,))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='Distorted (+/-std)')
+# 	# pl.plot(np.arange(len(new_bvals_high))+0.2, (new_signal_high[:,i_m,:,:].mean(axis=(1,2))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='ADC corr (+/-std)')
+# 	pl.plot(np.arange(len(new_bvals_high))+0.2, (new_signal_high[:,i_m,:].mean(axis=(1,))-gt_mean_high[i_m])/gt_mean_high[i_m], '.', label='ADC corr (+/-std)')
+# 	pl.title(bbSS[i2])
+# 	pl.legend()
+
+
+# pl.show()
 
