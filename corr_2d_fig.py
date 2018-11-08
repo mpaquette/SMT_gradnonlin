@@ -246,6 +246,21 @@ for ii in range(len(b_idx)):
 print(x_high)
 
 
+errors_unc_low = np.zeros_like(errors_low)
+errors_unc_high = np.zeros_like(errors_high)
+for ii in range(len(b_idx)):
+	errors_unc_low[ii] = errors_unc[bbSS.index(bcouple[ii][0])]
+	errors_unc_high[ii] = errors_unc[bbSS.index(bcouple[ii][1])]
+
+
+
+
+
+
+
+AA_low = errors_low/errors_unc_low
+AA_high = errors_high/errors_unc_high
+AA = 0.5*(AA_low+AA_high)
 
 
 
@@ -254,9 +269,98 @@ print(x_high)
 
 
 
+import matplotlib.colors as colors
+
+# set the colormap and centre the colorbar
+class MidpointNormalize(colors.Normalize):
+	"""
+	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
+
+	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+	"""
+	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+		self.midpoint = midpoint
+		colors.Normalize.__init__(self, vmin, vmax, clip)
+
+	def __call__(self, value, clip=None):
+		# I'm ignoring masked values and all kinds of edge cases to make a
+		# simple example...
+		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
 
 
 
+
+
+
+# fig, ax = pl.subplots()
+
+# # We want to show all ticks...
+# ax.set_xticks(np.arange(len(xaxistick)))
+# ax.set_yticks(np.arange(len(yaxistick)))
+# # ... and label them with the respective list entries
+# ax.set_xticklabels(xaxistick)
+# ax.set_yticklabels(yaxistick)
+
+# # Rotate the tick labels and set their alignment.
+# pl.setp(ax.get_xticklabels(), rotation=45, ha="right",
+#          rotation_mode="anchor")
+
+
+from matplotlib import rc
+pl.rcParams.update({'font.size': 20})
+rc('text', usetex=True)
+
+
+
+not12 = [12 in b for b in bcouple]
+not12p5 = [12.5 in b for b in bcouple]
+not11 = [11 in b for b in bcouple]
+not20 = [20 in b for b in bcouple]
+
+mm = np.logical_and(np.logical_and(np.logical_and(~np.array(not12),~np.array(not11)),~np.array(not12p5)),~np.array(not20))
+
+
+
+
+
+
+# bvalues
+xaxistick = bcouple[mm]
+# diffusivity
+yaxistick = [0.5, 1, 1.5, 2, 2.5]
+
+AAt = AA[mm]
+
+vmin = 0
+vmax = AAt.max()
+midpoint = 1
+
+
+fig, ax = pl.subplots()
+
+
+# pl.figure()
+# pl.imshow(AAt.T, vmax=4, cmap=pl.cm.seismic, interpolation='nearest', norm=MidpointNormalize(midpoint=midpoint,vmin=vmin,vmax=vmax))
+pl.imshow(AAt.T, cmap=pl.cm.seismic, interpolation='nearest', norm=MidpointNormalize(midpoint=midpoint,vmin=vmin,vmax=vmax))
+pl.colorbar()
+# pl.show()
+
+# We want to show all ticks...
+ax.set_xticks(np.arange(len(xaxistick)))
+ax.set_yticks(np.arange(len(yaxistick)))
+# ... and label them with the respective list entries
+ax.set_xticklabels(xaxistick)
+ax.set_yticklabels(yaxistick)
+
+# Rotate the tick labels and set their alignment.
+pl.setp(ax.get_xticklabels(), rotation=45, ha="right",
+         rotation_mode="anchor")
+
+pl.xlabel(r'b-value (ms/$\mu$m$^2$)', size=30)
+pl.ylabel(r'diffusivity ($\mu$m$^2$/ms)', size=30)
+
+pl.show()
 
 
 

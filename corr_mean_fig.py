@@ -12,7 +12,8 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
-bbSS = [1, 2, 3, 5, 10, 11, 12, 12.5, 15, 20]
+# bbSS = [1, 2, 3, 5, 10, 11, 12, 12.5, 15, 20]
+bbSS = [1, 2, 3, 5, 10, 11, 12, 15, 20]
 
 # remove b0
 bvecs = bvecs[bvals>10]
@@ -134,6 +135,88 @@ print(x_rat)
 
 
 
+
+
+import matplotlib.colors as colors
+
+# set the colormap and centre the colorbar
+class MidpointNormalize(colors.Normalize):
+	"""
+	Normalise the colorbar so that diverging bars work there way either side from a prescribed midpoint value)
+
+	e.g. im=ax1.imshow(array, norm=MidpointNormalize(midpoint=0.,vmin=-100, vmax=100))
+	"""
+	def __init__(self, vmin=None, vmax=None, midpoint=None, clip=False):
+		self.midpoint = midpoint
+		colors.Normalize.__init__(self, vmin, vmax, clip)
+
+	def __call__(self, value, clip=None):
+		# I'm ignoring masked values and all kinds of edge cases to make a
+		# simple example...
+		x, y = [self.vmin, self.midpoint, self.vmax], [0, 0.5, 1]
+		return np.ma.masked_array(np.interp(value, x, y), np.isnan(value))
+
+
+
+# bvalues
+xaxistick = bbSS
+# diffusivity
+yaxistick = [0.5, 1, 1.5, 2, 2.5]
+
+
+# fig, ax = pl.subplots()
+
+# # We want to show all ticks...
+# ax.set_xticks(np.arange(len(xaxistick)))
+# ax.set_yticks(np.arange(len(yaxistick)))
+# # ... and label them with the respective list entries
+# ax.set_xticklabels(xaxistick)
+# ax.set_yticklabels(yaxistick)
+
+# # Rotate the tick labels and set their alignment.
+# pl.setp(ax.get_xticklabels(), rotation=45, ha="right",
+#          rotation_mode="anchor")
+
+
+from matplotlib import rc
+pl.rcParams.update({'font.size': 20})
+rc('text', usetex=True)
+
+
+
+
+AA = errors/errors_unc
+
+vmin = 0
+vmax = AA.max()
+midpoint = 1
+
+
+fig, ax = pl.subplots()
+
+
+# pl.figure()
+pl.imshow(AA.T, cmap=pl.cm.viridis, interpolation='nearest')
+# pl.imshow(AA.T, cmap=pl.cm.seismic, interpolation='nearest', norm=MidpointNormalize(midpoint=midpoint,vmin=vmin,vmax=vmax))
+# pl.imshow(AA.T, cmap=pl.cm.RdBu_r, interpolation='nearest', norm=MidpointNormalize(midpoint=midpoint,vmin=vmin,vmax=vmax))
+pl.colorbar()
+# pl.show()
+
+# We want to show all ticks...
+ax.set_xticks(np.arange(len(xaxistick)))
+ax.set_yticks(np.arange(len(yaxistick)))
+# ... and label them with the respective list entries
+ax.set_xticklabels(xaxistick)
+ax.set_yticklabels(yaxistick)
+
+# # Rotate the tick labels and set their alignment.
+# pl.setp(ax.get_xticklabels(), rotation=45, ha="right",
+#          rotation_mode="anchor")
+
+pl.xlabel(r'b-value (ms/$\mu$m$^2$)', size=30)
+pl.ylabel(r'diffusivity ($\mu$m$^2$/ms)', size=30)
+
+pl.show()
 
 
 

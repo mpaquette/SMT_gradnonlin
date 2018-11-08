@@ -14,7 +14,7 @@ if bvecs.shape[1] != 3:
 
 bvals = np.genfromtxt(dpath+'bvals_b10.txt')
 
-bb = 15
+bb = 2
 
 # remove b0
 bvecs = bvecs[bvals>10]
@@ -55,16 +55,16 @@ allb = np.array(new_bvals)
 allb = allb.ravel()/bvals[0] - 1
 
 
-# pl.rcParams.update({'font.size': 12})
+pl.rcParams.update({'font.size': 12})
 
-# pl.figure()
-# pl.hist(allb, 50, density=True, color=(0.0,0.0,0.99,0.5))
-# sns.kdeplot(allb, bw=0.015, color='red')
-# frame1 = pl.gca()
-# frame1.axes.yaxis.set_ticklabels([])
-# # pl.title('Distribution of b-value modifier inside full brain')
-# pl.xlabel('b-value multiplier', size=16)
-# pl.show()
+pl.figure()
+pl.hist(allb, 50, density=True, color=(0.0,0.0,0.99,0.5))
+sns.kdeplot(allb, bw=0.015, color='red')
+frame1 = pl.gca()
+frame1.axes.yaxis.set_ticklabels([])
+# pl.title('Distribution of b-value modifier inside full brain')
+pl.xlabel('b-value multiplier', size=16)
+pl.show()
 
 
 
@@ -72,14 +72,14 @@ allv = np.array(new_bvecs)
 allvdiff = allv - bvecs
 angle_diff = ((180/np.pi)*np.arccos((2-np.linalg.norm(allvdiff, axis=2)**2)/2)).ravel()
 
-# pl.figure()
-# pl.hist(angle_diff, 50, density=True, color=(0.0,0.0,1.0,0.3))
-# sns.kdeplot(angle_diff, bw=0.3, color='red', kernel='cos')
-# frame1 = pl.gca()
-# frame1.axes.yaxis.set_ticklabels([])
-# # pl.title('Distribution of b-value modifier inside full brain')
-# pl.xlabel('direction deviation (degree)', size=16)
-# pl.show()
+pl.figure()
+pl.hist(angle_diff, 50, density=True, color=(0.0,0.0,1.0,0.3))
+sns.kdeplot(angle_diff, bw=0.3, color='red', kernel='cos')
+frame1 = pl.gca()
+frame1.axes.yaxis.set_ticklabels([])
+# pl.title('Distribution of b-value modifier inside full brain')
+pl.xlabel('direction deviation (degree)', size=16)
+pl.show()
 
 
 
